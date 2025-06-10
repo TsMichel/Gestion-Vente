@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Accueil - Gestion des Ventes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #0b034e;
+            padding: 20px 0;
+            height: 100%;
+            position: fixed;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar .logo {
+            margin-bottom: 40px;
+        }
+
+        .sidebar .logo span {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: left;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+            width: 100%;
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.3s;
+            display: flex;
+            align-items: left;
+            justify-content: left;
+            padding: 10px 0;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #3498db;
+            background: rgba(255, 255, 255, 0.1);
+            width: 140px;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #f5f7fa;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .header .date {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-card .icon {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .stat-card .info h3 {
+            font-size: 14px;
+            margin: 0;
+            color: #7f8c8d;
+        }
+
+        .stat-card .info p {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+            word-wrap: break-word;
+        }
+
+        .charts {
+            display: flex;
+            gap: 20px;
+            width: 98%;
+            height: 500px;
+        }
+
+        .market-overview {
+            flex: 2;
+            height: 100%;
+            margin-right: 20px;
+        }
+
+        .sales-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .market-overview .chart-card {
+            height: 100%;
+        }
+
+        .sales-container .chart-card {
+            height: calc(48% - 15px);
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            margin: 0 0 10px;
+            color: #2c3e50;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 100% !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">
+        <span>Vente</span>
+    </div>
+    <ul>
+        <li><a th:href="@{/home}">🏠 Home</a></li>
+<!--        <li><a th:href="@{/statistiques}">📈 Statistique</a></li>-->
+        <li><a th:href="@{/clients}">👥 Clients</a></li>
+        <li><a th:href="@{/ventes}">🏬 Vente</a></li>
+        <li><a th:href="@{/produits}">🛍️ Produits</a></li>
+        <li><a th:href="@{/export}">📤 Export/Facture</a></li>
+        <li><a th:href="@{/login}">🔒 Deconnecter</a></li>
+
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="header">
+        <h1>Tableau de Bord</h1>
+        <span class="date">Aujourd'hui 7 Mars, 2025</span>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="icon">🛍️</span>
+            <div class="info">
+                <h3>Total Produits</h3>
+                <p th:text="${stats.totalProduits}"></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="icon">👥</span>
+            <div class="info">
+                <h3>Total Clients</h3>
+                <p th:text="${stats.totalClients}"></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="icon">📈</span>
+            <div class="info">
+                <h3>Total Ventes</h3>
+                <p th:text="${stats.totalVentes}"></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="icon">💰</span>
+            <div class="info">
+                <h3>Chiffre d'Affaires</h3>
+                <p th:text="${#numbers.formatDecimal(stats.chiffreAffaires, 2, 'COMMA', 2, 'POINT')} + ' €'"></p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="icon">🏆</span>
+            <div class="info">
+                <h3>Produit le Plus Vendu</h3>
+                <p th:if="${not #maps.isEmpty(stats.produitPlusVendu)}"
+                   th:text="${stats.produitPlusVendu.keySet().toArray()[0] + ' (' + stats.produitPlusVendu.values().toArray()[0] + ' unités vendues)'}">
+                </p>
+                <p th:unless="${not #maps.isEmpty(stats.produitPlusVendu)}">Aucun produit vendu</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="icon">📅</span>
+            <div class="info">
+                <h3>Ventes Dernier Mois</h3>
+                <p th:text="${stats.ventesDernierMois}"></p>
+            </div>
+        </div>
+    </div>
+    <div class="charts">
+        <div class="market-overview">
+            <div class="chart-card">
+                <h3>Aperçu du Marché</h3>
+                <canvas id="marketOverviewChart"></canvas>
+            </div>
+        </div>
+        <div class="sales-container">
+            <div class="chart-card">
+                <h3>Aperçu des Ventes</h3>
+                <canvas id="salesOverviewChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Analyse des Ventes</h3>
+                <canvas id="salesAnalyticsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx1 = document.getElementById('marketOverviewChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            datasets: [
+                {
+                    label: 'Ventes Réelles',
+                    data: [12, 19, 15, 17, 16, 20, 18, 14, 13, 16],
+                    backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                    borderColor: '#3498db',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Objectifs',
+                    data: [10, 15, 12, 14, 13, 18, 16, 12, 11, 14],
+                    backgroundColor: 'rgba(155, 89, 182, 0.6)',
+                    borderColor: '#9b59b6',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } },
+            maintainAspectRatio: false
+        }
+    });
+
+    const ctx2 = document.getElementById('salesOverviewChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Ventes Directes', 'Ventes Online'],
+            datasets: [{
+                data: [71, 29],
+                backgroundColor: ['#3498db', '#ecf0f1']
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: {
+                legend: { position: 'bottom' }
+            },
+            maintainAspectRatio: false
+        }
+    });
+
+    const ctx3 = document.getElementById('salesAnalyticsChart').getContext('2d');
+    new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven'],
+            datasets: [{
+                label: 'Ventes',
+                data: [65, 59, 80, 81, 56],
+                fill: true,
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: '#3498db',
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } },
+            maintainAspectRatio: false
+        }
+    });
+</script>
+</body>
+</html>

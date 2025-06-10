@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Exportation et Facturation des Données</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #0b034e;
+            padding: 20px 0;
+            height: 100%;
+            position: fixed;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar .logo {
+            margin-bottom: 40px;
+        }
+
+        .sidebar .logo span {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: left;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+            width: 100%;
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.3s;
+            display: flex;
+            align-items: left;
+            justify-content: left;
+            padding: 10px 0;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #3498db;
+            background: rgba(255, 255, 255, 0.1);
+            width: 140px;
+        }
+
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        button {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo">
+        <span>Vente</span>
+    </div>
+    <ul>
+        <li><a th:href="@{/home}">🏠 Home</a></li>
+<!--        <li><a th:href="@{/statistiques}">📈 Statistique</a></li>-->
+        <li><a th:href="@{/clients}">👥 Clients</a></li>
+        <li><a th:href="@{/ventes}">🏬 Vente</a></li>
+        <li><a th:href="@{/produits}">🛍️ Produits</a></li>
+        <li><a th:href="@{/export}">📤 Export/Facture</a></li>
+        <li><a th:href="@{/login}">🔒 Deconnecter</a></li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="container">
+        <h1>Exportation et Facturation des Données</h1>
+
+        <!-- Section d'exportation -->
+        <form th:action="@{/export}" method="post">
+            <label>Sélectionner les tables à exporter :</label>
+            <input type="checkbox" name="tables" value="clients" id="clients">
+            <label for="clients">Clients</label>
+            <input type="checkbox" name="tables" value="produits" id="produits">
+            <label for="produits">Produits</label>
+            <input type="checkbox" name="tables" value="ventes" id="ventes">
+            <label for="ventes">Ventes</label>
+            <button type="submit">Exporter en Excel</button>
+        </form>
+
+        <!-- Section de facturation -->
+        <form th:action="@{/generate-facture}" method="post">
+            <label>Sélectionner une vente pour générer une facture :</label>
+            <select name="venteId" required>
+                <option value="">Choisir une vente</option>
+                <option th:each="vente : ${ventes}" th:value="${vente.id}" th:text="${'Vente #' + vente.id + ' - ' + vente.client.nom + ' - ' + vente.montantTotal + '€'}"></option>
+            </select>
+            <button type="submit">Générer Facture</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

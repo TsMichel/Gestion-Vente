@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestion des Clients</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa; /* Fond clair */
+            color: #2c3e50;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px; /* Taille augmentée */
+            background: #0b034e; /* Bleu foncé */
+            padding: 20px 0;
+            height: 100%;
+            position: fixed;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar .logo {
+            margin-bottom: 40px; /* Espacement accru pour équilibrer */
+        }
+
+        .sidebar .logo span {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: left; /* Alignement à gauche */
+            justify-content: left; /* Alignement vertical à gauche */
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0; /* Espacement réduit */
+            width: 100%;
+            text-align: left; /* Centrage horizontal du texte à gauche */
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 16px; /* Ajustement pour la lisibilité avec texte */
+            transition: 0.3s;
+            display: flex;
+            align-items: left; /* Alignement à gauche */
+            justify-content: left; /* Alignement à gauche */
+            padding: 10px 0; /* Padding pour les liens */
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #3498db;
+            background: rgba(255, 255, 255, 0.1); /* Légère surbrillance au survol */
+            width: 140px;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 220px; /* 200px (sidebar) + 20px (décalage) */
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #f5f7fa;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .header .date {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .content-section {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Barre de recherche */
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 50%; /* Réduction de la largeur de la barre de recherche */
+        }
+
+        .search-form input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #dfe6e9;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-form input:focus {
+            border-color: #3498db;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-form button:hover {
+            background: #2980b9;
+        }
+
+        /* Boutons de tri */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons a {
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .action-buttons .sort-asc,
+        .action-buttons .sort-desc {
+            background: #7f8c8d;
+            color: #fff;
+        }
+
+        .action-buttons .sort-asc:hover,
+        .action-buttons .sort-desc:hover {
+            background: #6c757d;
+        }
+
+        .action-buttons .add-client {
+            background: #2ecc71;
+            color: #fff;
+        }
+
+        .action-buttons .add-client:hover {
+            background: #27ae60;
+        }
+
+        /* Tableau */
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table th,
+        .client-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dfe6e9;
+        }
+
+        .client-table th {
+            background: #f1f3f5;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .client-table td {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .client-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .client-table .actions a {
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-right: 5px;
+            transition: background 0.3s;
+        }
+
+        .client-table .actions .edit {
+            background: #f39c12;
+            color: #fff;
+        }
+
+        .client-table .actions .edit:hover {
+            background: #e67e22;
+        }
+
+        .client-table .actions .delete {
+            background: #e74c3c;
+            color: #fff;
+        }
+
+        .client-table .actions .delete:hover {
+            background: #c0392b;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <span>Vente</span>
+        </div>
+        <ul>
+            <li><a th:href="@{/home}">🏠 Home</a></li>
+<!--            <li><a th:href="@{/statistiques}">📈 Statistique</a></li>-->
+            <li><a th:href="@{/clients}">👥 Clients</a></li>
+            <li><a th:href="@{/ventes}">🏬 Vente</a></li>
+            <li><a th:href="@{/produits}">🛍️ Produits</a></li>
+            <li><a th:href="@{/export}">📤 Export/Facture</a></li>
+            <li><a th:href="@{/login}">🔒 Deconnecter</a></li>
+
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Gestion des Clients</h1>
+            <span class="date">Today 22nd Jan, 2025</span>
+        </div>
+        <div class="content-section">
+            <!-- Barre de recherche -->
+            <form th:action="@{/clients/search}" method="get" class="search-form">
+                <input type="text" name="keyword" placeholder="Rechercher par nom ou email">
+                <button type="submit">Rechercher</button>
+            </form>
+
+            <!-- Boutons de tri -->
+            <div class="action-buttons">
+                <a th:href="@{/clients/sorted(direction='asc')}" class="sort-asc">Trier par nom (A-Z)</a>
+                <a th:href="@{/clients/sorted(direction='desc')}" class="sort-desc">Trier par nom (Z-A)</a>
+                <a th:href="@{/clients/add}" class="add-client">Ajouter un client</a>
+            </div>
+
+            <!-- Tableau des clients -->
+            <table class="client-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="client : ${clients}">
+                    <td th:text="${client.id}"></td>
+                    <td th:text="${client.nom}"></td>
+                    <td th:text="${client.email}"></td>
+                    <td th:text="${client.telephone}"></td>
+                    <td class="actions">
+                        <a th:href="@{/clients/edit(id=${client.id})}" class="edit">Modifier</a>
+                        <a th:href="@{/clients/delete(id=${client.id})}" class="delete">Supprimer</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
